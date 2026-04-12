@@ -1,3 +1,6 @@
+// Package handler provides HTTP request handlers, routing, and middleware.
+// It handles incoming HTTP requests, delegates to the service layer for
+// business logic, and returns JSON responses with appropriate status codes.
 package handler
 
 import (

@@ -1,3 +1,6 @@
+// Package database provides database connection management.
+// It handles the creation and configuration of a PostgreSQL connection pool
+// using pgx, reading connection details from the DATABASE_URL environment variable.
 package database
 
 import (

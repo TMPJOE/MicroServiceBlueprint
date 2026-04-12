@@ -1,3 +1,6 @@
+// Package service contains the business logic layer of the application.
+// It defines service interfaces and implements use cases by orchestrating
+// repositories, applying business rules, and returning results to handlers.
 package service
 
 import (

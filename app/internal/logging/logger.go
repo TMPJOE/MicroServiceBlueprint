@@ -1,3 +1,6 @@
+// Package logging provides structured logging for the application.
+// It configures a JSON-formatted logger using slog and httplog,
+// producing ECS-compatible log output suitable for log aggregation systems.
 package logging
 
 import (
