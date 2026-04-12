@@ -5,18 +5,26 @@ package database
 
 import (
 	"context"
-	"fmt"
-	"os"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func NewConn() (*pgxpool.Pool, error) {
-	conn, err := pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
-	fmt.Println(os.Getenv("DATABASE_URL"))
+func NewConn(connString string) (*pgxpool.Pool, error) {
+
+	config, err := pgxpool.ParseConfig(connString)
 	if err != nil {
 		return nil, err
 	}
+	config.MaxConns = 20
+	config.MinConns = 5
+	config.MaxConnIdleTime = 30 * time.Minute
+	config.MaxConnLifetime = 1 * time.Hour
+	config.HealthCheckPeriod = 30 * time.Second
 
+	conn, err := pgxpool.NewWithConfig(context.Background(), config)
+	if err != nil {
+		return nil, err
+	}
 	return conn, nil
 }

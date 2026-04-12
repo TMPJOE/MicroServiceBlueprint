@@ -15,7 +15,7 @@ type Service interface {
 
 type fooService struct {
 	l *slog.Logger
-	r *repo.Repo
+	r repo.ServiceRepository
 }
 
 func (s *fooService) Check() error {
@@ -25,7 +25,7 @@ func (s *fooService) Check() error {
 	return err
 }
 
-func New(l *slog.Logger, r *repo.Repo) Service {
+func New(l *slog.Logger, r repo.ServiceRepository) Service {
 	return &fooService{
 		l: l,
 		r: r,
