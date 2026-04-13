@@ -24,12 +24,21 @@ func New(s service.Service, l *slog.Logger) *Handler {
 }
 
 func (h *Handler) healthCheck(w http.ResponseWriter, r *http.Request) {
-	status := "healthy"
-	httpStatus := http.StatusOK
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+}
+
+// readinessCheck verifies if the service is ready to accept traffic
+// by pinging the database and other critical dependencies.
+func (h *Handler) readinessCheck(w http.ResponseWriter, r *http.Request) {
 	if err := h.s.Check(); err != nil {
-		status = "down"
-		httpStatus = http.StatusServiceUnavailable
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusServiceUnavailable)
+		json.NewEncoder(w).Encode(map[string]string{"status": "not ready", "reason": err.Error()})
+		return
 	}
-	w.WriteHeader(httpStatus)
-	json.NewEncoder(w).Encode(map[string]string{"status": status})
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"status": "ready"})
 }

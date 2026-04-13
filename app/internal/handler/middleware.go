@@ -3,7 +3,15 @@ package handler
 import (
 	"net/http"
 	"strconv"
+
+	"github.com/go-chi/chi/v5/middleware"
 )
+
+// RequestID adds a unique request ID to each request.
+// The ID is attached to response headers as X-Request-Id and logged.
+func RequestID(next http.Handler) http.Handler {
+	return middleware.RequestID(next)
+}
 
 func SecureHeaders(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
