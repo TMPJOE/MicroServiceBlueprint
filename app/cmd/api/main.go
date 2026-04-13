@@ -36,6 +36,11 @@ func main() {
 
 	defer db.Close()
 
+	err = database.RunMigrations(config.DbUrl, l)
+	if err != nil {
+		os.Exit(-1)
+	}
+
 	//repo creation
 	r := repo.NewDatabaseRepo(db)
 
