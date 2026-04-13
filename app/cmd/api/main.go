@@ -1,9 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"hotel.com/app/internal/database"
 	"hotel.com/app/internal/handler"
@@ -53,11 +57,35 @@ func main() {
 	//server creation
 	mux := h.NewServerMux()
 	srv := &http.Server{
-		Addr:    fmt.Sprintf("localhost:%s", config.Port),
+		Addr:    fmt.Sprintf(":%s", config.Port),
 		Handler: mux,
 	}
-	go srv.ListenAndServe()
-	// REMEMBER TO USE TLS ON "PRODUCTION"
+
+	l.Info("Server listening", "addr", srv.Addr)
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			l.Error("server failed", "err", err)
+			os.Exit(1)
+		}
+	}()
+
+	// Block until SIGTERM or SIGINT
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
+	<-quit
+
+	l.Info("Shutting down server...")
+
+	// Give in-flight requests 30s to finish
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		l.Error("Server forced to shutdown", "err", err)
+	}
+
+	l.Info("Server stopped")
+
 }
 
 func loadConfig() *Config {
