@@ -20,6 +20,7 @@ func (h *Handler) NewServerMux(rateLimiter *RateLimiter) *chi.Mux {
 	}))
 	r.Use(SecureHeaders)
 	r.Use(RequestID)
+	r.Use(CORS)
 
 	// Apply rate limiting if enabled
 	if rateLimiter != nil {
@@ -34,16 +35,14 @@ func (h *Handler) NewServerMux(rateLimiter *RateLimiter) *chi.Mux {
 	r.Group(func(r chi.Router) {
 		r.Get("/health", h.healthCheck)
 		r.Get("/ready", h.readinessCheck)
+		// Add other generic public endpoints here (metrics, version, etc.)
 	})
 
 	// Protected routes - require JWT authentication
 	r.Group(func(r chi.Router) {
 		r.Use(h.jwtAuth.Middleware()) // JWT authentication middleware
 
-		// Add protected routes here, e.g.:
-		// r.Get("/profile", h.getProfile)
-		// r.Put("/profile", h.updateProfile)
-		// r.Post("/logout", h.logout)
+		// Add protected routes here - keep abstract, not service-specific
 	})
 
 	return r
