@@ -3,12 +3,9 @@
 // providing a clean interface for the service layer to interact with PostgreSQL.
 package repo
 
-import (
-	"context"
-)
+import ()
 
 type ServiceRepository interface {
-	Foo(ctx context.Context) error
 	DbPing() error
 }
 

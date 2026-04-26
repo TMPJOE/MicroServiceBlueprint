@@ -13,12 +13,12 @@ type Service interface {
 	Check() error
 }
 
-type fooService struct {
+type blueprintService struct {
 	l *slog.Logger
 	r repo.ServiceRepository
 }
 
-func (s *fooService) Check() error {
+func (s *blueprintService) Check() error {
 	s.l.Info("Pinging db...")
 	err := s.r.DbPing()
 	s.l.Info("is service working", "err", err.Error())
@@ -26,7 +26,7 @@ func (s *fooService) Check() error {
 }
 
 func New(l *slog.Logger, r repo.ServiceRepository) Service {
-	return &fooService{
+	return &blueprintService{
 		l: l,
 		r: r,
 	}
